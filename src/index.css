@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #ffffff;
+  --color-bg-alt: #f8f9fa;
+  --color-bg-surface: #f1f3f5;
+  --color-text: #1a1a2e;
+  --color-text-2: #6b7280;
+  --color-text-3: #9ca3af;
+  --color-accent: #6366f1;
+  --color-accent-hover: #4f46e5;
+  --color-border: #e5e7eb;
+  --color-key: #0550ae;
+  --color-string: #0a3069;
+  --color-number: #0550ae;
+  --color-boolean: #cf222e;
+  --color-null: #6e7781;
+  --color-added: #1a7f37;
+  --color-removed: #cf222e;
+  --color-changed: #9a6700;
+}
+
+[data-theme="dark"] {
+  --color-bg: #0d1117;
+  --color-bg-alt: #161b22;
+  --color-bg-surface: #1c2128;
+  --color-text: #e6edf3;
+  --color-text-2: #8b949e;
+  --color-text-3: #6e7681;
+  --color-accent: #818cf8;
+  --color-accent-hover: #6366f1;
+  --color-border: #30363d;
+  --color-key: #79c0ff;
+  --color-string: #a5d6ff;
+  --color-number: #79c0ff;
+  --color-boolean: #ff7b72;
+  --color-null: #8b949e;
+  --color-added: #3fb950;
+  --color-removed: #ff7b72;
+  --color-changed: #d29922;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, ui-monospace, monospace;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-3);
+}
+
+@keyframes animate-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-in {
+  animation: animate-in 0.2s ease-out;
+}
+
+.react-flow__node {
+  cursor: pointer;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+.cm-editor {
+  height: 100% !important;
+}
+
+.cm-editor .cm-scroller {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace !important;
+  font-size: 13px !important;
+}
+
+.react-diff-viewer {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace !important;
+  font-size: 12px !important;
+}

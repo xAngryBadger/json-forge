@@ -1,0 +1,16 @@
+{
+  "name": "json-forge",
+  "short_name": "JSON Forge",
+  "description": "The JSON tool that doesn't choke — viewer, formatter, diff, type generation, and more",
+  "start_url": "/json-forge/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
