@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import type { Edge, Node } from 'reactflow'
 import ReactFlow, { Controls, MiniMap, Background, useNodesState, useEdgesState } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -15,13 +15,21 @@ interface NodeMeta {
   path: (string | number)[]
 }
 
-const nodeMetaMap = new Map<string, NodeMeta>()
+function graphPathToId(path: (string | number)[]): string {
+  if (path.length === 0) return 'groot'
+  let r = 'groot'
+  for (const seg of path) {
+    if (typeof seg === 'number') r += `[${seg}]`
+    else if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(String(seg))) r += `.${seg}`
+    else r += `['${seg}']`
+  }
+  return r
+}
 
-function buildGraphData(data: unknown): { nodes: Node[]; edges: Edge[] } {
-  nodeMetaMap.clear()
+function buildGraphData(data: unknown): { nodes: Node[]; edges: Edge[]; metaMap: Map<string, NodeMeta> } {
+  const nodeMetaMap = new Map<string, NodeMeta>()
   const nodes: Node[] = []
   const edges: Edge[] = []
-  let nodeIdx = 0
   const colWidth = 160
   const depthCounts = new Map<number, number>()
 
@@ -32,7 +40,7 @@ function buildGraphData(data: unknown): { nodes: Node[]; edges: Edge[] } {
     depth: number,
     parentId: string | null,
   ): string {
-    const id = `gnode-${nodeIdx++}`
+    const id = graphPathToId(path)
     nodeMetaMap.set(id, { path })
 
     const isContainer = value !== null && typeof value === 'object'
@@ -116,11 +124,16 @@ function buildGraphData(data: unknown): { nodes: Node[]; edges: Edge[] } {
   }
 
   addNode(data, '', [], 0, null)
-  return { nodes, edges }
+  return { nodes, edges, metaMap: nodeMetaMap }
 }
 
 export function GraphView({ data, onSelectNode, isDark }: GraphViewProps) {
-  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => buildGraphData(data), [data])
+  const nodeMetaMapRef = useRef(new Map<string, NodeMeta>())
+  const { nodes: initialNodes, edges: initialEdges, metaMap } = useMemo(() => buildGraphData(data), [data])
+
+  useEffect(() => {
+    nodeMetaMapRef.current = metaMap
+  }, [metaMap])
 
   const [rfNodes, setRfNodes, onRfNodesChange] = useNodesState(initialNodes)
   const [rfEdges, setRfEdges, onRfEdgesChange] = useEdgesState(initialEdges)
@@ -132,7 +145,7 @@ export function GraphView({ data, onSelectNode, isDark }: GraphViewProps) {
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: Node) => {
-      const meta = nodeMetaMap.get(node.id)
+      const meta = nodeMetaMapRef.current.get(node.id)
       if (meta) {
         onSelectNode(meta.path)
       }

@@ -18,6 +18,17 @@ function getChildCount(value: unknown): number {
   return 0
 }
 
+function pathToId(path: (string | number)[]): string {
+  if (path.length === 0) return 'root'
+  let r = 'root'
+  for (const seg of path) {
+    if (typeof seg === 'number') r += `[${seg}]`
+    else if (/^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(String(seg))) r += `.${seg}`
+    else r += `['${seg}']`
+  }
+  return r
+}
+
 function flattenNode(
   value: unknown,
   key: string | number,
@@ -27,9 +38,8 @@ function flattenNode(
   parentId: string | null,
   lineNum: { value: number },
   matchedPaths: Set<string>,
-  counter: { value: number },
 ): FlatNode[] {
-  const id = `node-${counter.value++}`
+  const id = pathToId(path)
   const pathStr = path.length === 0 ? '$' : (() => {
     let r = '$'
     for (const seg of path) {
@@ -77,7 +87,6 @@ function flattenNode(
             id,
             lineNum,
             matchedPaths,
-            counter,
           ),
         )
       }
@@ -94,7 +103,6 @@ function flattenNode(
             id,
             lineNum,
             matchedPaths,
-            counter,
           ),
         )
       }
@@ -109,9 +117,8 @@ export function useVirtualTree(data: unknown) {
   const [matchedPaths, setMatchedPaths] = useState<Set<string>>(new Set())
 
   const flatNodes = useMemo(() => {
-    const counter = { value: 0 }
     const lineNum = { value: 1 }
-    return flattenNode(data, '', 0, [], collapsedNodes, null, lineNum, matchedPaths, counter)
+    return flattenNode(data, '', 0, [], collapsedNodes, null, lineNum, matchedPaths)
   }, [data, collapsedNodes, matchedPaths])
 
   const toggleCollapse = useCallback((nodeId: string) => {

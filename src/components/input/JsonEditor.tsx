@@ -66,6 +66,7 @@ export function JsonEditor({ value, onChange, isDark }: JsonEditorProps) {
 
     return () => {
       view.destroy()
+      viewRef.current = null
     }
   }, [isDark])
 
