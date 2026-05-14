@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { detailedDiff } from 'deep-object-diff'
 
 export interface DiffResult {
@@ -9,8 +9,19 @@ export interface DiffResult {
 }
 
 export function useDiff(leftStr: string, rightStr: string) {
-  const [leftInput, setLeftInput] = useState(leftStr)
-  const [rightInput, setRightInput] = useState(rightStr)
+  const [leftOverride, setLeftOverride] = useState<string | null>(null)
+  const [rightOverride, setRightOverride] = useState<string | null>(null)
+
+  const leftInput = leftOverride ?? leftStr
+  const rightInput = rightOverride ?? rightStr
+
+  const setLeftInput = useCallback((value: string) => {
+    setLeftOverride(value)
+  }, [])
+
+  const setRightInput = useCallback((value: string) => {
+    setRightOverride(value)
+  }, [])
 
   const diffResult = useMemo<DiffResult>(() => {
     try {
