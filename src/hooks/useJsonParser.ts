@@ -14,6 +14,7 @@ export function useJsonParser(delay: number = 150) {
   })
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const workerRef = useRef<Worker | null>(null)
+  const versionRef = useRef(0)
 
   useEffect(() => {
     try {
@@ -21,7 +22,8 @@ export function useJsonParser(delay: number = 150) {
         new URL('../lib/json-worker.ts', import.meta.url),
         { type: 'module' },
       )
-      workerRef.current.onmessage = (e: MessageEvent) => {
+      workerRef.current.onmessage = (e: MessageEvent<{ version: number; success: boolean; data: unknown; error: string }>) => {
+        if (e.data.version !== versionRef.current) return
         if (e.data.success) {
           setResult({ data: e.data.data, error: null, errorLine: null, errorCol: null })
         } else {
@@ -41,12 +43,15 @@ export function useJsonParser(delay: number = 150) {
     (text: string) => {
       if (timerRef.current) clearTimeout(timerRef.current)
 
+      const version = ++versionRef.current
+
       if (text.length > LARGE_FILE_THRESHOLD && workerRef.current) {
-        workerRef.current.postMessage({ input: text })
+        workerRef.current.postMessage({ input: text, version })
         return
       }
 
       timerRef.current = setTimeout(() => {
+        if (versionRef.current !== version) return
         setResult(parseJson(text))
       }, delay)
     },
@@ -67,5 +72,5 @@ export function useJsonParser(delay: number = 150) {
     }
   }, [])
 
-  return { input, result, setInput: setInputAndParse, parseImmediately: (text: string) => setResult(parseJson(text)) }
+  return { input, result, setInput: setInputAndParse, parseImmediately: (text: string) => { versionRef.current++; setResult(parseJson(text)) } }
 }
